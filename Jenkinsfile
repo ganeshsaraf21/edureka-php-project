@@ -1,10 +1,11 @@
 pipeline {
-    agent any
-
+    agent {
+        label 'slave_1'
+    }
     stages {
-        stage('checkout') {
+        stage('Checkout') {
             steps {
-               git branch: 'main', url: ' git clone https://github.com/ganeshsaraf21/edureka-php-project.git'
+               git branch: 'main', url: 'https://github.com/ganeshsaraf21/edureka-php-project.git'
             }
         }
         stage('Docker Build'){
@@ -12,14 +13,17 @@ pipeline {
                 sh "docker build . -t ganeshsaraf21/edureka-php-website"
             }
         }
-        stage('DockerHub Push'){
+        stage('Docker Push'){
             steps{
-
                 withCredentials([string(credentialsId: 'dockerkey', variable: 'dockerkey')]) {
-                      sh "docker login -u kaleemsony -p ${dockerkey}"
+                      sh "docker login -u ganeshsaraf21 -p ${dockerkey}"
                 }
-
-                sh "docker push kaleemsony/my-php-website "
+                sh "docker push ganeshsaraf21/edureka-php-website"
+            }
+        }
+        stage('Docker run container'){
+            steps{
+                sh "docker container run -dt --name php_website8 -p 9086:80 ganeshsaraf21/edureka-php-website"
             }
         }
     }
